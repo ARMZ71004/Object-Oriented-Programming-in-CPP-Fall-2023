@@ -1,0 +1,130 @@
+#include "List.h"
+
+                                              
+List::List(): head(nullptr), tail(nullptr) {}
+List::~List()
+{
+    Node *temp = head;
+    Node *next;
+    while(temp != nullptr) {
+        next = temp;
+        temp = temp->next;
+        delete next;
+    }
+    head = tail = nullptr;        
+}
+Iterator List::begin() {
+    return Iterator(head);
+} 
+Iterator List::end() {
+    return Iterator(nullptr);
+}
+Iterator List::rbegin() {
+    return Iterator(tail);
+}                    
+Iterator List::rend() {
+    return Iterator(nullptr);
+}
+void List::push_front(List &list, const int &d)                   
+{
+    Node *temp = new Node(d);
+    if(list.head == nullptr) {
+       list.tail = temp;
+    } else {
+        temp->next = list.head; 
+        list.head->prev = temp; 
+    }             
+    list.head = temp;                            
+}
+void List::push_back(List &list, const int &d)                    
+{
+    if(list.head == nullptr) {                     
+        push_front(list, d);
+        return;
+    }
+    Node *temp = new Node(d);                                                           
+    list.tail->next = temp;                                               
+    temp->prev = list.tail;                                     
+    list.tail = temp;                                      
+}
+void List::pop_front(List &list) {
+    if(list.head == nullptr) { return; }                    
+    Node *temp = list.head;                                 
+    list.head = list.head->next;                            
+    delete temp;                                            
+    if(list.head != nullptr) {                              
+        list.head->prev = nullptr;                          
+    } else {                                                
+        list.tail = nullptr;                                 
+    }
+}
+void List::pop_back(List &list) {
+    if(list.tail == nullptr) { return; }                    
+    if(list.tail == list.head) {                            
+        pop_front(list);
+        return;
+    }
+    Node *temp = list.tail;                                 
+    list.tail = list.tail->prev;                             
+    list.tail->next = nullptr;                             
+    delete temp;                                            
+}
+Iterator List::insert(List &list, Iterator itr, const int &d)     
+{
+    if(itr.current == nullptr) { return itr; }             
+    if(list.head == nullptr || itr.current == list.head) { 
+        push_front(list, d);
+        return list.begin();
+    }
+    Node *temp = new Node(d);                             
+    temp->next = itr.current;                              
+    temp->prev = itr.current->prev;
+    itr.current->prev->next = temp; 
+    itr.current->prev = temp;
+    return Iterator(temp);
+}
+Iterator List::erase(List &list, Iterator itr)          
+{
+    if(itr.current == nullptr) { return itr; }              
+    if(list.head == nullptr || itr.current == list.head ) { return itr; } 
+    if(list.head == itr.current->prev) {                   
+        pop_front(list);
+        return list.begin(); 
+    }                              
+    Node *temp = itr.current->prev;                         
+    itr.current->prev = temp->prev;                         
+    temp->prev->next = itr.current;                         
+    delete temp;                                         
+    return itr;                                      
+}
+void List::duplicate(List &a, List &b)
+{
+    Iterator itr = a.begin();
+    while( itr.hasNext() ) {
+        push_back(b, itr.getData());    
+        itr.next();  
+    }   
+}
+void List::print(List &list) {                              
+    for(Iterator itr=list.begin(); itr.hasNext(); itr.next()) {
+        std::cout << itr.getData() << " ";
+    }  
+    std::cout << "\n";
+}
+void List::printRev(List &list) { 
+    Iterator itr = list.rbegin();
+    while(itr.hasPrev()) {
+        std::cout << itr.getData() << " ";    
+        itr.prev();  
+    }  
+    std::cout << "\n";   
+}
+Iterator List::find(List &list, int d) 
+{
+    Iterator itr = list.begin();
+    while( itr.hasNext() ) {
+        if( itr.getData() == d ) { return itr; }
+        itr.next();
+    }   
+    return Iterator(nullptr);     
+}

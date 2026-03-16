@@ -1,0 +1,28 @@
+#include "Node.h"
+#include "Iterator.h"
+
+Iterator::Iterator(Node *n): current(n) {
+}
+void Iterator::next() {
+    current = current->next;
+}
+void Iterator::prev() {
+    current = current->prev;
+}
+bool Iterator::hasNext() {
+    if(current != nullptr) { 
+        return true; 
+    } else {
+        return false;
+    }
+}
+bool Iterator::hasPrev() {
+    if(current != nullptr) { 
+        return true; 
+    } else {
+        return false;
+    }
+}    
+int& Iterator::getData() {
+    return current->data;
+}
